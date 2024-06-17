@@ -2,13 +2,13 @@
 
 namespace App\Models\Data;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TahunAkademik extends Model
 {   
-    use HasFactory, HasUuids;
+    use HasFactory, HasUlids;
 
     protected $table = 'tahunakademik';
     protected $primaryKey = 'id';

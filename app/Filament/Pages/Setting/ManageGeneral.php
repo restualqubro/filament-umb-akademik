@@ -13,6 +13,7 @@ use Filament\Support\Facades\FilamentView;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Storage;
 use Riodwanto\FilamentAceEditor\AceEditor;
+use App\Models\Data\TahunAkademik;
 
 use function Filament\Support\is_app_url;
 
@@ -75,6 +76,19 @@ class ManageGeneral extends SettingsPage
                                     0 => "Not Active",
                                     1 => "Active",
                                 ])
+                                ->native(false)
+                                ->required(),
+                            Forms\Components\Select::make('akademik_active')
+                                ->label('Status Akademik')
+                                ->options([
+                                    0 => "Not Active",
+                                    1 => "Active",
+                                ])
+                                ->native(false)
+                                ->required(),
+                            Forms\Components\Select::make('akademik_id')
+                                ->label('Kode Akademik')
+                                ->options(TahunAkademik::all()->pluck('code', 'id'))
                                 ->native(false)
                                 ->required(),
                         ]),
