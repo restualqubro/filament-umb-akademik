@@ -12,8 +12,8 @@ class GeneralSettings extends Settings
     public bool $site_active;
     public ?string $site_favicon;
     public array $site_theme;
-    public ?string $akademik_active;
-    public ?string $akademik_id;
+    // public ?string $akademik_active;
+    // public ?string $akademik_id;    
 
     public static function group(): string
     {
