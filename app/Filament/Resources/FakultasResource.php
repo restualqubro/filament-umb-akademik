@@ -87,7 +87,7 @@ class FakultasResource extends Resource
     {
         return [
             'index' => Pages\ListFakultas::route('/'),
-            // 'create' => Pages\CreateFakultas::route('/create'),
+            'create' => Pages\CreateFakultas::route('/create'),
             // 'edit' => Pages\EditFakultas::route('/{record}/edit'),
         ];
     }

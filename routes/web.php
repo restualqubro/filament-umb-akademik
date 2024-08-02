@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Report\Cuti;
+use App\Http\Controllers\Verified;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+Route::get('/report/cuti/{id}', [Cuti::class, 'generatePDF']);
+Route::get('/validate/cuti/{id}', [Verified::class, 'cuti']);

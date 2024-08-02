@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Permission\Traits\HasRoles;
 
 class Fakultas extends Model
 {
-    use HasFactory, HasUlids;
+    use HasFactory, HasUlids, HasRoles;
 
     protected $table = 'fakultas';
     protected $primaryKey = 'id';

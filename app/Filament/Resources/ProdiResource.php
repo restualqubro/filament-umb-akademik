@@ -31,7 +31,7 @@ class ProdiResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('code')
-                    ->label('Kode Prodi')
+                    ->label('Kode Prodi') 
                     ->required()
                     ->maxLength(5),
                 Forms\Components\TextInput::make('nama_prodi')

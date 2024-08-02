@@ -54,7 +54,7 @@ class Dashboard extends BaseDashboard
                                     })                                
                             ])
                             ->action(function (array $data): void {                                     
-                                    $id = Str::ulid();
+                                    $id = Str::ulid();                                    
                                     $record[] = array();
                                     $record['id'] = $id;
                                     $record['surat_id'] = $id;
@@ -64,7 +64,7 @@ class Dashboard extends BaseDashboard
                                     $record['alasan'] = $data['alasan'];
                                     $record['mahasiswa_id'] = $data['mahasiswa_id'];
                                     $record['akademik_id']= $data['akademik_id'];
-                                    $record['jenis'] = 1;
+                                    $record['jenis'] = 'Cuti';
                                     Surat::Create($record);
                                     Cuti::Create($record);
                                     redirect('/apps');

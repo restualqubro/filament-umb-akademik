@@ -5,10 +5,11 @@ namespace App\Models\Data;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\Traits\HasRoles;
 
 class TahunAkademik extends Model
 {   
-    use HasFactory, HasUlids;
+    use HasFactory, HasUlids, HasRoles;
 
     protected $table = 'tahunakademik';
     protected $primaryKey = 'id';

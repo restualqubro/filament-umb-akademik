@@ -10,15 +10,14 @@ use App\Settings\GeneralSettings;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages;
+use Filament\Pages\Report\Cuti;
 use Filament\Pages\Auth\Register;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets;
-use App\Filament\Resources\TahunAkademikResource;
-use Filament\Navigation\NavigationBuilder;
-use Filament\Navigation\NavigationItem;
+use App\Http\Controllers\Report\Cuti as PengajuanCuti;
+use App\Http\Controllers\Verified;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -27,6 +26,7 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Filament\Pages\PengajuanData;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -36,7 +36,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->spa()
             ->id('admin')
-            ->path('apps')
+            ->path('')
             ->colors([
                 'primary' => Color::hex('#0e7490')
             ])
@@ -59,8 +59,13 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                // Pages\Dashboard::class,
+                // 'Report' => Cuti::route('/report'),
             ])
+            ->routes(function () {
+                //  add to /portal/*
+                Route::get('/report/cuti/{id}', [PengajuanCuti::class, 'generatePDF']);
+                Route::get('/validate/cuti/{id}', [Verified::class, 'cuti']);
+            })
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([                
                 // Widgets\AccountWidget::class,

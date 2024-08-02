@@ -7,10 +7,13 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Traits\HasRoles;
 
 class Cuti extends Model
 {
     use HasFactory;
+    use HasRoles;
 
     protected $table = 'surat_cuti';
     protected $fillable = [
@@ -41,4 +44,9 @@ class Cuti extends Model
     {
         return $this->belongsTo(User::class);
     }
+    
+    public function getRoleAttribute()
+    {    
+        return $this->roles()->first();
+    }    
 }

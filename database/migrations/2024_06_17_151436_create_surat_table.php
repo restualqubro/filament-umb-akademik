@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('surat', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->foreignUlid('mahasiswa_id')->references('id')->on('users');
-            $table->string('akademik_id');
+            $table->string('akademik_id')->references('code')->on('tahunakademik');
             $table->foreignUlid('operator_id')->references('id')->on('users')->nullable();
             $table->string('update_detail')->nullable();
             $table->enum('status', ['Baru', 'Checked', 'Verifikasi', 'Validasi', 'Disetujui', 'Ditolak', 'Perbaikan']);
-            $table->tinyInteger('jenis');
+            $table->enum('jenis', ['1', '2', '3', '4', '5']);
             $table->timestamps();
         });
     }
