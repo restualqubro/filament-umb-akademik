@@ -3,23 +3,23 @@
 namespace App\Http\Controllers\Report;
 
 use App\Http\Controllers\Controller;
-use App\Models\Layanan\Cuti as LayananCuti;
 use Illuminate\Http\Request;
+use App\Models\Layanan\Cuti as LayananCuti;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
-class Cuti extends Controller
+class Aktif extends Controller
 {
     public static function generatePDF($id)
     {        
         // $image = QrCode::size(300)->generate('Embed this content into the QR Code');
         $data = [
             'title'     => 'PDF View',
-            'image'     => base64_encode(QrCode::size(100)->generate(url('/validate/cuti/'.$id)))
+            'image'     => base64_encode(QrCode::size(100)->generate(url('/validate/pindah/'.$id)))
 
         ];
  
-    	$pdf = PDF::loadview('filament.pages.report.cuti', $data);
+    	$pdf = PDF::loadview('filament.pages.report.aktif', $data);
     	return $pdf->stream();
         // return $image;
 

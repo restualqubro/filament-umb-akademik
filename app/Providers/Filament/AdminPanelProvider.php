@@ -16,6 +16,10 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use App\Http\Controllers\Report\Cuti as PengajuanCuti;
+use App\Http\Controllers\Report\Pindah as PengajuanPindah;
+use App\Http\Controllers\Report\Aktif as PengajuanAktif;
+use App\Http\Controllers\Report\Undur as PengajuanUndur;
+use App\Http\Controllers\Report\Profesi as PengajuanProfesi;
 use App\Http\Controllers\Verified;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -65,6 +69,18 @@ class AdminPanelProvider extends PanelProvider
                 //  add to /portal/*
                 Route::get('/report/cuti/{id}', [PengajuanCuti::class, 'generatePDF']);
                 Route::get('/validate/cuti/{id}', [Verified::class, 'cuti']);
+
+                Route::get('/report/aktif/{id}', [PengajuanCuti::class, 'generatePDF']);
+                Route::get('/validate/aktif/{id}', [Verified::class, 'aktif']);
+
+                Route::get('/report/pindah/{id}', [PengajuanCuti::class, 'generatePDF']);
+                Route::get('/validate/pindah/{id}', [Verified::class, 'pindah']);
+
+                Route::get('/report/undur/{id}', [PengajuanCuti::class, 'generatePDF']);
+                Route::get('/validate/undur/{id}', [Verified::class, 'undur']);
+
+                Route::get('/report/profesi/{id}', [PengajuanCuti::class, 'generatePDF']);
+                Route::get('/validate/profesi/{id}', [Verified::class, 'profesi']);
             })
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([                

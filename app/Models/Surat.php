@@ -27,7 +27,7 @@ class Surat extends Model
 
     public function mahasiswa(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'mahasiswa_id', 'id');
     }
 
     public function operator(): BelongsTo
@@ -42,6 +42,6 @@ class Surat extends Model
     
     public function akademik(): BelongsTo
     {
-        return $this->belongsTo(TahunAkademik::class);
+        return $this->belongsTo(TahunAkademik::class, 'akademik_id', 'code');
     }    
 }

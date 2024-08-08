@@ -22,4 +22,9 @@ class TahunAkademik extends Model
         'tahun',
         'semester'
     ];
+
+    public function getNameAttribute() 
+    {
+        return "{$this->tahun} {$this->semester}";
+    }
 }

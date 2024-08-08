@@ -16,10 +16,11 @@ return new class extends Migration
             $table->foreignUlid('surat_id')->references('id')->on('surat');
             $table->string('surat_pernyataan');
             $table->string('slip_bebasspp');
-            $table->string('memo_perpus');
-            $table->foreignUlid('dosen_id')->references('id')->on('users')->nullable();
-            $table->foreignUlid('admin_id')->references('id')->on('users')->nullable();
-            $table->foreignUlid('wrektor_id')->references('id')->on('users')->nulalble();
+            $table->string('memo_perpus');            
+            $table->foreignUlid('dosen_id')->references('id')->on('users')->nullable()->unsigned();
+            $table->foreignUlid('kaprodi_id')->references('id')->on('users')->nullable()->unsigned();
+            $table->foreignUlid('dekan_id')->references('id')->on('users')->nullable()->unsigned();
+            $table->foreignUlid('wrektor_id')->references('id')->on('users')->nulalble()->unsigned();
             $table->string('no_surat')->nullable();
             $table->timestamps();
         });
