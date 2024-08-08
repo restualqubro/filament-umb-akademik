@@ -17,9 +17,10 @@ return new class extends Migration
             $table->string('surat_cuti');
             $table->string('surat_pernyataan');
             $table->string('slip_lunasspp');            
-            $table->foreignUlid('dosen_id')->references('id')->on('users')->nullable();
-            $table->foreignUlid('admin_id')->references('id')->on('users')->nullable();
-            $table->foreignUlid('wrektor_id')->references('id')->on('users')->nulalble();
+            $table->foreignUlid('dosen_id')->references('id')->on('users')->nullable()->unsigned();
+            $table->foreignUlid('kaprodi_id')->references('id')->on('users')->nullable()->unsigned();
+            $table->foreignUlid('dekan_id')->references('id')->on('users')->nullable()->unsigned();
+            $table->foreignUlid('wrektor_id')->references('id')->on('users')->nulalble()->unsigned();
             $table->string('no_surat')->nullable();
             $table->timestamps();
         });

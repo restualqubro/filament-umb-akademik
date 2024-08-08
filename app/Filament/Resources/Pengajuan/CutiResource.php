@@ -3,22 +3,21 @@
 namespace App\Filament\Resources\Pengajuan;
 
 use App\Filament\Resources\Pengajuan\CutiResource\Pages;
-use App\Filament\Resources\Pengajuan\CutiResource\RelationManagers;
 use App\Models\Layanan\Cuti;
 use App\Models\Surat;
-use App\Models\Data\TahunAkademik;
 use Filament\Infolists\Infolist;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\Actions;
 use Filament\Infolists\Components\Actions\Action;
 use Filament\Support\Enums\VerticalAlignment;
 use Filament\Forms\Form;
+use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
 
 
 class CutiResource extends Resource
@@ -56,8 +55,8 @@ class CutiResource extends Resource
                 Tables\Columns\TextColumn::make('surat.akademik.name')
                     ->label('SEMESTER')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('surat.jenis')
-                    ->label('JENIS SURAT'),
+                Tables\Columns\TextColumn::make('surat.mahasiswa.mahasiswa.prodi.nama_prodi')
+                    ->label('PRODI'),
                 Tables\Columns\TextColumn::make('surat.status')
                     ->label('STATUS SURAT')
                     ->badge()
@@ -66,14 +65,20 @@ class CutiResource extends Resource
                         'Verifikasi' => 'warning',
                         'Validasi Dosen' => 'secondary',
                         'Validasi Kaprodi' => 'secondary',
+                        'Validasi Dekan' => 'secondary',
                         'Disetujui' => 'success',
                         'Ditolak' => 'danger',
-                        'Perbaikan' => 'info'                            
+                        'Perbaikan' => 'info',
+                        'Diperbaiki' => 'info'                            
                     }),                
             ])            
             ->filters([
-                Tables\Filters\SelectFilter::make('akademik_id')                                        
-                    ->relationship(name: 'surat', titleAttribute: 'akademik_id')            
+                Tables\Filters\SelectFilter::make('akademik_id') 
+                    ->label('Kode Akademik')                                       
+                    ->relationship(name: 'surat', titleAttribute: 'akademik_id'),
+                Tables\Filters\SelectFilter::make('prodi_id')
+                    ->label('Prodi')
+                    ->relationship(name: 'surat.mahasiswa.mahasiswa.prodi', titleAttribute: 'nama_prodi')           
             ])
             ->actions([
                 Tables\Actions\ViewAction::make('detail'),                
@@ -88,10 +93,10 @@ class CutiResource extends Resource
                         $record['status'] = "Verifikasi";
                         Surat::where('id', $surat['surat_id'])->update([
                             'operator_id'   => $record['operator_id'],
-                            'update_detail' => 'Pengajuan anda telah mendapatkan Verifikasi dari Operator',
+                            'update_detail' => 'Pengajuan anda telah mendapatkan Verifikasi dari Operator Akademik',
                             'status'        => $record['status'],                            
                         ]);
-                    })->visible(fn(Cuti $record) => $record->surat->status === 'Baru' && auth()->user()->roles->pluck('name')[0] === 'Operator'),
+                    })->visible(fn(Cuti $record) => $record->surat->status === 'Baru' || $record->surat->status === 'Diperbaiki' && auth()->user()->roles->pluck('name')[0] === 'Operator'),
                 Tables\Actions\Action::make('validasi_dosen')
                     ->label('Validasi Dosen')
                     ->icon('heroicon-o-list-bullet')
@@ -126,23 +131,161 @@ class CutiResource extends Resource
                             'kaprodi_id'      => $record['kaprodi_id']
                         ]);
                     })->visible(fn (Cuti $record) => $record->surat->status === 'Validasi Dosen' && auth()->user()->roles->pluck('name')[0] === 'Kaprodi'),
-                Tables\Actions\Action::make('disetujui')
-                    ->label('Disetujui')
+                Tables\Actions\Action::make('validasi_dekan')
+                    ->label('Validasi Dekan')
                     ->icon('heroicon-o-list-bullet')
                     ->color('secondary')
                     ->requiresConfirmation()
                     ->action(function (array $data, Cuti $surat): void {                                                                        
                         $record[] = array();                        
-                        $record['dekan_id'] = auth()->user()->id;                        
-                        $record['status'] = "Disetujui";
-                        Surat::where('id', $surat['surat_id'])->update([  
-                            'update_detail' => 'Pengajuan anda telah mendapatkan Persetujuan dari Dekan dan anda dapat menggunakan Surat Cuti ini sebagai Syarat Sah',                          
+                        $record['dekan_id'] = auth()->user()->id;
+                        $record['status'] = "Validasi Dekan";
+                        Surat::where('id', $surat['surat_id'])->update([ 
+                            'update_detail' => 'Pengajuan anda telah mendapatkan Validasi dari Dekan Fakultas',                           
                             'status'        => $record['status'],                            
                         ]);
                         Cuti::where('id', $surat['id'])->update([
-                            'dekan_id'    => $record['dekan_id'],                            
+                            'dekan_id'      => $record['dekan_id']
                         ]);
-                    })->visible(fn (Cuti $record) => $record->surat->status === 'Validasi Kaprodi' && auth()->user()->roles->pluck('name')[0] === 'Dekan'),                
+                    })->visible(fn (Cuti $record) => $record->surat->status === 'Validasi Kaprodi' && auth()->user()->roles->pluck('name')[0] === 'Dekan'),
+                Tables\Actions\Action::make('disetujui')
+                    ->label('Disetujui')
+                    ->icon('heroicon-o-check')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->action(function (array $data, Cuti $surat): void {                                                                        
+                        $month = Carbon::now()->format('m');                        
+                        $map = array('X' => 10, 'IX' => 9, 'V' => 5, 'IV' => 4, 'I' => 1);
+                        $monthRomanian = '';
+                        while ($month > 0) {
+                            foreach ($map as $roman => $int) {
+                                if($month >= $int) {
+                                    $month -= $int;
+                                    $monthRomanian .= $roman;
+                                    break;
+                                }
+                            }
+                        }                        
+                        // 001/UM-BJM/S.1/VII/2024
+                        // Cuti::whereHas('surat', function($q) {
+                        //     $q->where('status', '!=', 'Baru');
+                        //     $q->where('status', '!=', 'Perbaikan');
+                        //     $q->where('status', '!=', 'Diperbaiki');
+                        // })
+                        $last = Cuti::whereHas('surat', function($q) {
+                            $date = Carbon::now()->format('Y-m');
+                            $q->where('status', 'Disetujui');                            
+                        })
+                        ->whereMonth('updated_at', '=', date('m'))
+                        ->whereYear('updated_at', '=', date('Y'))
+                        ->max('no_surat');                                                
+                        // $last = Cuti::whereRaw("MID(no_surat, 16, 4) = $date")->max('code');                                        
+                        // dd($last);
+                        $code = '';
+                        if ($last != null) {                                                                                            
+                            $tmp = substr($last, 0, 3)+1;
+                            $code = sprintf("%03s", $tmp)."/UM-BJM/S.1/".$monthRomanian."/".Carbon::now()->format('Y');                                                                            
+                        } else {
+                            $code = "001/UM-BJM/S.1/".$monthRomanian."/".Carbon::now()->format('Y');
+                        }                        
+                        // $record['wrektor_id'] = auth()->user()->id;                        
+                        // $record['status'] = "Disetujui";
+                        Surat::where('id', $surat['surat_id'])->update([  
+                            'update_detail' => 'Pengajuan anda telah mendapatkan Persetujuan dari Wakil Rektor 1 dan anda dapat menggunakan Surat Cuti ini sebagai Syarat Sah',                          
+                            'status'        => 'Disetujui',                            
+                        ]);
+                        Cuti::where('id', $surat['id'])->update([
+                            'wrektor_id'    => auth()->user()->id, 
+                            'no_surat'      =>  $code,                          
+                        ]);
+                    })->visible(fn (Cuti $record) => $record->surat->status === 'Validasi Dekan' && auth()->user()->roles->pluck('name')[0] === 'Wakil Rektor'), 
+                Tables\Actions\Action::make('perbaikan')
+                    ->label('Perbaikan')               
+                    ->icon('heroicon-o-pencil-square')
+                    ->color('info')
+                    ->form([
+                        Textarea::make('detail')
+                                    ->required(),
+                    ])
+                    ->action(function (array $data, Cuti $surat): void {                        
+                        Surat::where('id', $surat['surat_id'])->update([  
+                            'update_detail' => 'Pengajuan anda di tunda karena terdapat kesalahan sebagai berikut : '.$data['detail'],                          
+                            'status'        => 'Perbaikan',                            
+                            'operator_id'   => auth()->user()->id,
+                        ]);                        
+                    })->visible(fn (Cuti $record) => $record->surat->status === 'Baru' || $record->surat->status === 'Diperbaiki' && auth()->user()->roles->pluck('name')[0] === 'Operator'),                                       
+                Tables\Actions\Action::make('ditolak_operator')
+                    // ->label('Ditolak')               
+                    ->icon('heroicon-o-no-symbol')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->action(function (array $data, Cuti $surat): void {                                                                                                
+                        Surat::where('id', $surat['surat_id'])->update([  
+                            'update_detail' => 'Pengajuan anda Ditolak oleh pihak Operator Akademik',                          
+                                'status'        => 'Ditolak',                            
+                        ]);                                                                      
+                    })->visible(fn (Cuti $record) => $record->surat->operator_id === null && auth()->user()->roles->pluck('name')[0] === 'Operator'),
+                Tables\Actions\Action::make('ditolak_dosen')
+                    // ->label('Ditolak')               
+                    ->icon('heroicon-o-no-symbol')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->action(function (array $data, Cuti $surat): void {                                                                                                
+                        Cuti::where('surat_id', $surat['surat_id'])->update([                          
+                            'status'        => 'Ditolak',                            
+                        ]);                                              
+                        Surat::where('id', $surat['surat_id'])->update([
+                            'update_detail' => 'Pengajuan anda Ditolak oleh pihak Dosen Pembimbing Akademik',                          
+                        ]);                        
+                    })->visible(fn (Cuti $record) => $record->dosen_id === null && auth()->user()->roles->pluck('name')[0] === 'Dosen'),
+                Tables\Actions\Action::make('ditolak_kaprodi')
+                    // ->label('Ditolak')               
+                    ->icon('heroicon-o-no-symbol')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->action(function (array $data, Cuti $surat): void {                                                                                                
+                        Cuti::where('surat_id', $surat['surat_id'])->update([                          
+                            'status'        => 'Ditolak',                            
+                        ]);                                              
+                        Surat::where('id', $surat['surat_id'])->update([
+                            'update_detail' => 'Pengajuan anda Ditolak oleh pihak Kepala Program Studi',                          
+                        ]);                                                                       
+                    })->visible(fn (Cuti $record) => $record->kaprodi_id === null && auth()->user()->roles->pluck('name')[0] === 'Kaprodi'),
+                Tables\Actions\Action::make('ditolak_dekan')
+                    // ->label('Ditolak')               
+                    ->icon('heroicon-o-no-symbol')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->action(function (array $data, Cuti $surat): void {                                                                                                
+                        Cuti::where('surat_id', $surat['surat_id'])->update([                          
+                            'status'        => 'Ditolak',                            
+                        ]);                                              
+                        Surat::where('id', $surat['surat_id'])->update([
+                            'update_detail' => 'Pengajuan anda Ditolak oleh pihak Dekan Fakultas',                          
+                        ]); 
+                    })->visible(fn (Cuti $record) => $record->dekan_id === null && auth()->user()->roles->pluck('name')[0] === 'Dekan'),
+                Tables\Actions\Action::make('ditolak_wrektor')
+                    // ->label('Ditolak')               
+                    ->icon('heroicon-o-no-symbol')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->action(function (array $data, Cuti $surat): void {                                                                                                
+                        Cuti::where('surat_id', $surat['surat_id'])->update([                          
+                            'status'        => 'Ditolak',                            
+                        ]);                                              
+                        Surat::where('id', $surat['surat_id'])->update([
+                            'update_detail' => 'Pengajuan anda Ditolak oleh pihak Wakil Rektor 1',                          
+                        ]); 
+                    })->visible(fn (Cuti $record) => $record->wrektor_id === null && auth()->user()->roles->pluck('name')[0] === 'Wakil Rektor'),
+                Tables\Actions\Action::make('print')
+                    // ->label('Ditolak')               
+                    ->icon('heroicon-o-printer')
+                    ->color('success')                    
+                    ->url(function(Cuti $record) {
+                        return url('report/cuti/'.$record->surat_id);
+                    })
+                    ->openUrlInNewTab()  
+                    ->visible(fn (Cuti $record) => $record->surat->status === 'Disetujui'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -171,15 +314,17 @@ class CutiResource extends Resource
                             'Verifikasi' => 'warning',
                             'Validasi Dosen' => 'secondary',
                             'Validasi Kaprodi' => 'secondary',
+                            'Validasi Dekan' => 'secondary',
                             'Disetujui' => 'success',
                             'Ditolak' => 'danger',
-                            'Perbaikan' => 'info'                            
+                            'Perbaikan' => 'info',
+                            'Diperbaiki' => 'info'                            
                         }),
                     TextEntry::make('alasan')
                         ->label('Alasan Pengajuan'),
                     TextEntry::make('updated_at')
                         ->label('Timestamp Update Terakhir'),
-                    TextEntry::make('update_detail')
+                    TextEntry::make('surat.update_detail')
                         ->label('Detail Update'),                   
                     Actions::make([
                         Action::make('surat_pernyataan')
@@ -222,19 +367,34 @@ class CutiResource extends Resource
     {
         if (auth()->user()->roles->pluck('name')[0] === 'Dosen') {
             return Cuti::whereHas('surat', function($q) {
-                $q->where('status', 'Checked');
+                $q->where('status', '!=', 'Baru');
+                $q->where('status', '!=', 'Perbaikan');
+                $q->where('status', '!=', 'Diperbaiki');
             });
         } else if (auth()->user()->roles->pluck('name')[0] === 'Kaprodi') {
             return Cuti::whereHas('surat', function($q) {
-                $q->where('status', 'Verifikasi');
+                $q->where('status', '!=', 'Baru');
+                $q->where('status', '!=', 'Verifikasi');
+                $q->where('status', '!=', 'Perbaikan');
+                $q->where('status', '!=', 'Diperbaiki');
             });
         } else if (auth()->user()->roles->pluck('name')[0] === 'Dekan') {
             return Cuti::whereHas('surat', function($q) {
-                $q->where('status', 'Validasi');
+                $q->where('status', '!=', 'Baru');
+                $q->where('status', '!=', 'Verifikasi');
+                $q->where('status', '!=', 'Validasi Dosen');
+                $q->where('status', '!=', 'Perbaikan');
+                $q->where('status', '!=', 'Diperbaiki');
             });
-        } else if (auth()->user()->roles->pluck('name')[0] === 'Mahasiswa') {
-            return Cuti::whereHas('surat.mahasiswa', function($q) {
-                $q->where('mahasiswa_id', auth()->user()->id);
+            
+        } else if (auth()->user()->roles->pluck('name')[0] === 'Wakil Rektor') {
+            return Cuti::whereHas('surat', function($q) {
+                $q->where('status', '!=', 'Baru');
+                $q->where('status', '!=', 'Verifikasi');
+                $q->where('status', '!=', 'Validasi Dosen');
+                $q->where('status', '!=', 'Validasi Kaprodi');
+                $q->where('status', '!=', 'Perbaikan');
+                $q->where('status', '!=', 'Diperbaiki');
             });
         } else {
             return Cuti::whereHas('surat');

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('surat_cuti', function (Blueprint $table) {
             $table->id();
             $table->foreignUlid('surat_id')->references('id')->on('surat');
+            $table->string('alasan');
             $table->string('surat_pernyataan');
             $table->string('slip_bebasspp');
             $table->string('memo_perpus');            
