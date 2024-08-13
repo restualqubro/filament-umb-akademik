@@ -14,7 +14,10 @@ return new class extends Migration
         Schema::create('pegawai', function (Blueprint $table) {
             $table->id();
             $table->foreignUlid('user_id')->references('id')->on('users')->nullable();
-            $table->foreignUlid('prodi_id')->references('id')->on('prodi')->nullable();
+            $table->ulid('prodi_id')->unique()->nullable();
+            $table->foreign('prodi_id')->references('id')->on('prodi');
+            $table->ulid('fakultas_id')->unique()->nullable();
+            $table->foreign('fakultas_id')->references('id')->on('fakultas');
             $table->timestamps();
         });
     }

@@ -3,6 +3,8 @@
 namespace App\Livewire;
 
 use App\Models\User;
+use App\Models\Data\Prodi;
+use App\Models\Data\Fakultas;
 use Illuminate\Support\Facades\DB;
 use Exception;
 use Filament\Facades\Filament;
@@ -130,19 +132,21 @@ class MyProfileExtended extends MyProfileComponent
                                     // }),                                    
                                     // ->options(fn($query) => $query->with('roles')->whereRelation('roles', 'name', '=', 'mahasiswa')),
                                 Select::make('prodi_id')
-                                    ->options([
-                                        'Anu'   => 'Anu'
-                                    ])
+                                    ->options(Prodi::all()->pluck('nama_prodi', 'id'))
                             ])
                         ])->visible(fn() => auth()->user()->roles->pluck('name')->first() === 'Mahasiswa'),
                     Group::make()
                         ->relationship('pegawai')
                         ->schema([
                             Select::make('prodi_id')
-                                ->options([
-                                    'Anu'   => 'Anu'
-                                ])
-                        ])->visible(fn() => auth()->user()->roles->pluck('name')->first() === 'Admin'),
+                            ->options(Prodi::all()->pluck('nama_prodi', 'id'))
+                        ])->visible(fn() => auth()->user()->roles->pluck('name')->first() === 'Kaprodi'),
+                    Group::make()
+                        ->relationship('pegawai')
+                        ->schema([
+                            Select::make('fakultas_id')
+                            ->options(Fakultas::all()->pluck('nama_fakultas', 'id'))
+                        ])->visible(fn() => auth()->user()->roles->pluck('name')->first() === 'Dekan'),
             ])
             ->operation('edit')
             ->model($this->getUser())

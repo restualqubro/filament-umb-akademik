@@ -12,8 +12,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class Cuti extends Model
 {
-    use HasFactory;
-    use HasRoles;
+    use HasFactory, HasRoles;    
 
     protected $table = 'surat_cuti';
     protected $fillable = [

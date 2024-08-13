@@ -11,8 +11,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class Undur extends Model
 {
-    use HasFactory;
-    use HasRoles;
+    use HasFactory, HasRoles;    
 
     protected $table = 'surat_undur';
     protected $fillable = [

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class Cuti extends Controller
 {
@@ -29,6 +30,7 @@ class Cuti extends Controller
                             join users ON surat_cuti.wrektor_id = users.id) as nama
                             ')
                             ->get(),
+            'tanggal'   => Carbon::now()->isoFormat('D MMMM Y'),
         //     // 'items'     => LayananCuti::where('surat_id', $id)->get(),
             'image'     => base64_encode(QrCode::size(100)->generate(url('/validate/cuti/'.$id)))
 

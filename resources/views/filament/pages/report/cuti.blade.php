@@ -68,7 +68,7 @@ table, .table-in {
   {{-- <img src="{{ asset('/storage/sites/01J47B3N6G2ZNMD3083P4RFNHX.png')}}" class="logo-top"> --}}
   @foreach($items as $item)
   <div class="box">
-  Barito Kuala, <br/>
+  Barito Kuala, {{$tanggal}}<br/>
   </div>
   <br/><br/>
   <table class="table-paragraph">

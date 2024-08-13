@@ -25,7 +25,7 @@ class UndurResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $pluralModelLabel = 'Pengajuan Undur dari Cuti';
+    protected static ?string $pluralModelLabel = 'Pengajuan Mengundurkan Diri';
 
     protected static ?string $navigationGroup = 'Pengajuan';
 

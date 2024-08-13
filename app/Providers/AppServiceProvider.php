@@ -22,6 +22,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
+        setlocale(LC_TIME, 'id_ID');
+            \Carbon\Carbon::setLocale('id');
+            \Carbon\Carbon::now()->formatLocalized("%A, %d %B %Y");
         Table::configureUsing(function (Table $table): void {
             $table
                 ->emptyStateHeading('No data yet')
