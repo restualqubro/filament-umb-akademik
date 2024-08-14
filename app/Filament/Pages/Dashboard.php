@@ -7,7 +7,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Form;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
@@ -17,6 +17,8 @@ use App\Models\Layanan\Aktif;
 use App\Models\Layanan\Pindah;
 use App\Models\Layanan\Undur;
 use App\Models\Layanan\Profesi;
+use App\Models\User;
+use App\Settings\GeneralSettings;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -27,7 +29,22 @@ class Dashboard extends BaseDashboard
     public function filtersForm(Form $form): Form
     {
         return $form
-            ->schema([                                                                  
+            ->schema([         
+                Section::make()                                            
+                    ->schema([
+                        Placeholder::make('')
+                            ->content('Silahkan lengkapi profil anda terlebih dahulu untuk membuat Pengajuan Akademik pada halaman Profil')
+                            
+                    ])                               
+                    ->columnSpan('full')
+                    ->visible(fn(User $user, $record, GeneralSettings $setting): bool => (auth()->user()->roles->pluck('name')[0] === 'Mahasiswa' && $user->where([                                
+                        ['telp', null],
+                        ['birth_date', null],
+                        ['birth_place', null],
+                        ['address', null],
+                        ['gender', null],
+                        ['agama', null] 
+                    ])->exists())),                                           
                 Section::make('Pengajuan Surat Cuti')                                            
                     ->description('Harap baca persyaratan dibawah sebelum mengajukan')                
                     ->headerActions([
@@ -56,7 +73,14 @@ class Dashboard extends BaseDashboard
                                         $code = DB::table('settings')->where('name', 'akademik_id')->first()->payload;                                     
                                         return Str::substr($code, 1, 7 );
                                     })                                
-                            ])
+                            ])->disabled(fn(User $user, GeneralSettings $setting): bool => $user->where([                                
+                                ['telp', null],
+                                ['birth_date', null],
+                                ['birth_place', null],
+                                ['address', null],
+                                ['gender', null],
+                                ['agama', null] 
+                            ])->exists())
                             ->action(function (array $data): void {                                     
                                     $id = Str::ulid();                                    
                                     $record[] = array();
@@ -76,8 +100,8 @@ class Dashboard extends BaseDashboard
                             }),
                             // ->action(fn ($record) => dd($record)),
                     ])
-                    ->schema([                        
-                    ])->columnSpan(2),                
+                    ->hidden(fn(User $user, $record, GeneralSettings $settings): bool => (auth()->user()->roles->pluck('name')[0] !== 'Mahasiswa' && $settings->akademik_active === '0' ))
+                    ->columnSpan(2),                
                 // Halat                                                             
                 Section::make('Pengajuan Surat Aktif')                    
                     ->description('Harap baca persyaratan dibawah sebelum mengajukan')                
@@ -102,6 +126,14 @@ class Dashboard extends BaseDashboard
                                         return Str::substr($code, 1, 7 );
                                     })                                   
                             ])
+                            ->disabled(fn(User $user): bool => $user->where([                                
+                                ['telp', null],
+                                ['birth_date', null],
+                                ['birth_place', null],
+                                ['address', null],
+                                ['gender', null],
+                                ['agama', null] 
+                            ])->exists())
                             ->action(function (array $data): void {                                     
                                 $id = Str::ulid();                                    
                                 $record[] = array();
@@ -117,8 +149,8 @@ class Dashboard extends BaseDashboard
                                 redirect('/');                                                                                                                          
                         }),
                     ])
-                    ->schema([                        
-                    ])->columnSpan(2),
+                    ->hidden(fn(User $user, $record): bool => (auth()->user()->roles->pluck('name')[0] !== 'Mahasiswa'))
+                    ->columnSpan(2),
                 // halat
                 Section::make('Pengajuan Surat Pindah')                    
                     ->description('Harap baca persyaratan dibawah sebelum mengajukan')                
@@ -147,6 +179,14 @@ class Dashboard extends BaseDashboard
                                         return Str::substr($code, 1, 7 );
                                     })                                                                      
                             ])
+                            ->disabled(fn(User $user): bool => $user->where([                                
+                                ['telp', null],
+                                ['birth_date', null],
+                                ['birth_place', null],
+                                ['address', null],
+                                ['gender', null],
+                                ['agama', null] 
+                            ])->exists())
                             ->action(function (array $data): void {                                     
                                 $id = Str::ulid();                                    
                                 $record[] = array();
@@ -163,8 +203,8 @@ class Dashboard extends BaseDashboard
                                 redirect('/');                                                                                                                          
                         }),
                     ])
-                    ->schema([                        
-                    ])->columnSpan(2),
+                    ->hidden(fn(User $user, $record): bool => (auth()->user()->roles->pluck('name')[0] !== 'Mahasiswa'))
+                    ->columnSpan(2),
                 // halat
                 Section::make('Pengajuan Surat Mengundurkan Diri') 
                     ->description('Harap baca persyaratan dibawah sebelum mengajukan')                
@@ -193,6 +233,14 @@ class Dashboard extends BaseDashboard
                                         return Str::substr($code, 1, 7 );
                                     })                                                                
                             ])  
+                            ->disabled(fn(User $user): bool => $user->where([                                
+                                ['telp', null],
+                                ['birth_date', null],
+                                ['birth_place', null],
+                                ['address', null],
+                                ['gender', null],
+                                ['agama', null] 
+                            ])->exists())
                             ->action(function (array $data): void {                                     
                                 $id = Str::ulid();                                    
                                 $record[] = array();
@@ -209,9 +257,9 @@ class Dashboard extends BaseDashboard
                                 Undur::Create($record);
                                 redirect('/');                                                                                                                          
                         }),
-                    ])                 
-                    ->schema([                        
-                    ])->columnSpan(2),                                                                             
+                    ])
+                    ->hidden(fn(User $user, $record): bool => (auth()->user()->roles->pluck('name')[0] !== 'Mahasiswa'))
+                    ->columnSpan(2),                                                                             
                 // Halat
                 Section::make('Pengajuan Surat Tidak Lanjut Profesi')                    
                     ->description('Harap baca persyaratan dibawah sebelum mengajukan')                
@@ -240,6 +288,14 @@ class Dashboard extends BaseDashboard
                                         return Str::substr($code, 1, 7 );
                                     })                                                                                             
                             ])  
+                            ->disabled(fn(User $user): bool => $user->where([                                
+                                ['telp', null],
+                                ['birth_date', null],
+                                ['birth_place', null],
+                                ['address', null],
+                                ['gender', null],
+                                ['agama', null] 
+                            ])->exists())
                             ->action(function (array $data): void {                                     
                                 $id = Str::ulid();                                    
                                 $record[] = array();
@@ -256,10 +312,11 @@ class Dashboard extends BaseDashboard
                                 redirect('/');                                                                                                                          
                         }),
                     ])
-                    ->schema([                        
-                    ])->columnSpan(2),
+                    ->hidden(fn(User $user, $record): bool => (auth()->user()->roles->pluck('name')[0] !== 'Mahasiswa'))
+                    ->columnSpan(2),
                 // Halat                
                 // Halat
             ])->columns(6);
     }
+   
 }

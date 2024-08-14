@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-
+        
         setlocale(LC_TIME, 'id_ID');
             \Carbon\Carbon::setLocale('id');
             \Carbon\Carbon::now()->formatLocalized("%A, %d %B %Y");

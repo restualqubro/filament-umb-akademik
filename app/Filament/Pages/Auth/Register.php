@@ -2,35 +2,48 @@
 
 namespace App\Filament\Pages\Auth;
 
-// use Filament\Actions\Concerns\CanUseDatabaseTransactions;
-use Filament\Forms\Components\Component;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Forms\Components\Hidden;
 use Filament\Pages\Auth\Register as BaseRegister;
-use Filament\Pages\Concerns\InteractsWithFormActions;
-
+use Filament\Forms\Components\Component;
+ 
 class Register extends BaseRegister
 {
-
-    // use CanUseDatabaseTransactions;
-    // use InteractsWithFormActions;
-    // protected static ?string $navigationIcon = 'heroicon-o-document-text';
-
-    // protected static string $view = 'filament.pages.auth.register';
-
-    public function form(Form $form): Form
+    protected function getForms(): array
     {
-        return $form
-            ->schema([
-                TextInput::make('username')
-                    ->required()
-                    ->maxLength(255),
-                $this->getNameFormComponent(),
-                $this->getEmailFormComponent(),
-                $this->getPasswordFormComponent(),
-                $this->getPasswordConfirmationFormComponent(),
-            ]);
+        return [
+            'form' => $this->form(
+                $this->makeForm()
+                    ->schema([                        
+                        $this->getUsernameFormComponent(),
+                        $this->getFirstnameFormComponent(),
+                        $this->getLastnameFormComponent(),
+                        $this->getEmailFormComponent(),
+                        $this->getPasswordFormComponent(),
+                        $this->getPasswordConfirmationFormComponent(),                                                                                      
+                    ])
+                    ->statePath('data'),
+            ),
+        ];
     }
-    
+ 
+    protected function getUsernameFormComponent(): Component
+    {
+        return TextInput::make('username')
+            ->label('Nomor Induk Mahasiswa')            
+            ->required();
+    }
+
+    protected function getFirstnameFormComponent(): Component
+    {
+        return TextInput::make('firstname')  
+            ->label('Nama Depan')          
+            ->required();
+    }
+    protected function getLastnameFormComponent(): Component
+    {
+        return TextInput::make('lastname') 
+            ->label('Nama Belakang')           
+            ->required();
+    }     
 }
