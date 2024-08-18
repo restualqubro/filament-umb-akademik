@@ -165,13 +165,7 @@ class CutiResource extends Resource
                                     break;
                                 }
                             }
-                        }                        
-                        // 001/UM-BJM/S.1/VII/2024
-                        // Cuti::whereHas('surat', function($q) {
-                        //     $q->where('status', '!=', 'Baru');
-                        //     $q->where('status', '!=', 'Perbaikan');
-                        //     $q->where('status', '!=', 'Diperbaiki');
-                        // })
+                        }                                               
                         $last = Cuti::whereHas('surat', function($q) {
                             $date = Carbon::now()->format('Y-m');
                             $q->where('status', 'Disetujui');                            
@@ -405,8 +399,8 @@ class CutiResource extends Resource
     {
         return [
             'index' => Pages\ListCutis::route('/'),
-            'create' => Pages\CreateCuti::route('/create'),
-            'edit' => Pages\EditCuti::route('/{record}/edit'),
+            // 'create' => Pages\CreateCuti::route('/create'),
+            // 'edit' => Pages\EditCuti::route('/{record}/edit'),
         ];
     }
 }

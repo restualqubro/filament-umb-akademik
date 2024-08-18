@@ -17,7 +17,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Carbon;
 
 class ProfesiResource extends Resource
 {
@@ -39,20 +39,44 @@ class ProfesiResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([      
-                Tables\Columns\TextColumn::make('surat.id'),
-                Tables\Columns\TextColumn::make('surat.jenis'),
-                Tables\Columns\TextColumn::make('surat.status'),
-                Tables\Columns\TextColumn::make('surat.mahasiswa.username')
-            ])            
-            ->filters([
-                Tables\Filters\SelectFilter::make('akademik_id') 
-                    ->label('Kode Akademik')                                       
-                    ->relationship(name: 'surat', titleAttribute: 'akademik_id'),
-                Tables\Filters\SelectFilter::make('prodi_id')
-                    ->label('Prodi')
-                    ->relationship(name: 'surat.mahasiswa.mahasiswa.prodi', titleAttribute: 'nama_prodi')           
-            ])
+        ->columns([    
+            Tables\Columns\TextColumn::make('index')
+                ->label('No')
+                ->rowIndex(),  
+            Tables\Columns\TextColumn::make('surat.mahasiswa.username')                    
+                ->searchable()
+                ->label('NPM'),
+            Tables\Columns\TextColumn::make('surat.mahasiswa.name')
+                ->label('NAMA')
+                ->searchable(),                
+            Tables\Columns\TextColumn::make('surat.akademik.name')
+                ->label('SEMESTER')
+                ->sortable(),
+            Tables\Columns\TextColumn::make('surat.mahasiswa.mahasiswa.prodi.nama_prodi')
+                ->label('PRODI'),
+            Tables\Columns\TextColumn::make('surat.status')
+                ->label('STATUS SURAT')
+                ->badge()
+                ->color(fn (string $state): string => match ($state) {
+                    'Baru' => 'gray',
+                    'Verifikasi' => 'warning',
+                    'Validasi Dosen' => 'secondary',
+                    'Validasi Kaprodi' => 'secondary',
+                    'Validasi Dekan' => 'secondary',
+                    'Disetujui' => 'success',
+                    'Ditolak' => 'danger',
+                    'Perbaikan' => 'info',
+                    'Diperbaiki' => 'info'                            
+                }),                
+        ])            
+        ->filters([
+            Tables\Filters\SelectFilter::make('akademik_id') 
+                ->label('Kode Akademik')                                       
+                ->relationship(name: 'surat', titleAttribute: 'akademik_id'),
+            Tables\Filters\SelectFilter::make('prodi_id')
+                ->label('Prodi')
+                ->relationship(name: 'surat.mahasiswa.mahasiswa.prodi', titleAttribute: 'nama_prodi')           
+        ])
             ->actions([
                 Tables\Actions\ViewAction::make('detail'),                
                 Tables\Actions\Action::make('verifikasi')
@@ -127,15 +151,43 @@ class ProfesiResource extends Resource
                     ->color('secondary')
                     ->requiresConfirmation()
                     ->action(function (array $data, Profesi $surat): void {                                                                        
-                        $record[] = array();                        
-                        $record['wrektor_id'] = auth()->user()->id;                        
-                        $record['status'] = "Disetujui";
+                        $month = Carbon::now()->format('m');                        
+                        $map = array('X' => 10, 'IX' => 9, 'V' => 5, 'IV' => 4, 'I' => 1);
+                        $monthRomanian = '';
+                        while ($month > 0) {
+                            foreach ($map as $roman => $int) {
+                                if($month >= $int) {
+                                    $month -= $int;
+                                    $monthRomanian .= $roman;
+                                    break;
+                                }
+                            }
+                        }                                               
+                        $last = Profesi::whereHas('surat', function($q) {
+                            $date = Carbon::now()->format('Y-m');
+                            $q->where('status', 'Disetujui');                            
+                        })
+                        ->whereMonth('updated_at', '=', date('m'))
+                        ->whereYear('updated_at', '=', date('Y'))
+                        ->max('no_surat');                                                
+                        // $last = Cuti::whereRaw("MID(no_surat, 16, 4) = $date")->max('code');                                        
+                        // dd($last);
+                        $code = '';
+                        if ($last != null) {                                                                                            
+                            $tmp = substr($last, 0, 3)+1;
+                            $code = sprintf("%03s", $tmp)."/UM-BJM/S.1/".$monthRomanian."/".Carbon::now()->format('Y');                                                                            
+                        } else {
+                            $code = "001/UM-BJM/S.5/".$monthRomanian."/".Carbon::now()->format('Y');
+                        }                        
+                        // $record['wrektor_id'] = auth()->user()->id;                        
+                        // $record['status'] = "Disetujui";
                         Surat::where('id', $surat['surat_id'])->update([  
-                            'update_detail' => 'Pengajuan anda telah mendapatkan Persetujuan dari Wakil Rektor 1 dan anda dapat menggunakan Surat Cuti ini sebagai Syarat Sah',                          
-                            'status'        => $record['status'],                            
+                            'update_detail' => 'Pengajuan anda telah mendapatkan Persetujuan dari Wakil Rektor 1 dan anda dapat menggunakan Surat Tidak Lanjut Profesi ini sebagai Syarat Sah',                          
+                            'status'        => 'Disetujui',                            
                         ]);
                         Profesi::where('id', $surat['id'])->update([
-                            'wrektor_id'    => $record['dekan_id'],                            
+                            'wrektor_id'    => auth()->user()->id, 
+                            'no_surat'      =>  $code,                          
                         ]);
                     })->visible(fn (Profesi $record) => $record->surat->status === 'Validasi Dekan' && auth()->user()->roles->pluck('name')[0] === 'Wakil Rektor'), 
                 Tables\Actions\Action::make('perbaikan')

@@ -66,19 +66,18 @@ table, .table-in {
    <img src="data:image/png;base64,{{ base64_encode(file_get_contents( "images/logo-umb.png" )) }}" class="logo-top"> 
    {{-- <img src="{{ asset('/images/logo-umb.png')}}" class="logo-top"> --}}
   {{-- <img src="{{ asset('/storage/sites/01J47B3N6G2ZNMD3083P4RFNHX.png')}}" class="logo-top"> --}}
-  <?php 
-//   $a = $row->row_array();
-  ?>
+  @foreach($items as $item)
   <div class="box">
-  Barito Kuala, <br/>
+  Barito Kuala, {{$tanggal}}<br/>
   </div>
   <br/><br/>
   <table class="table-paragraph">
     <tr>
       <td>Nomor</td>
       <td>:</td>
-      {{-- <td></td> --}}
+      <td>{{$item->no_surat}}</td>
     </tr>
+
     <tr>
       <td>Lampiran</td>
       <td>:</td>
@@ -87,7 +86,7 @@ table, .table-in {
     <tr>
       <td>Perihal</td>
       <td>:</td>
-      <td>Persetujuan Izin Cuti Akadmeik</td>
+      <td>Persetujuan Izin Aktif dari Cuti Akadmeik</td>
     </tr>
     <tr>
       <td></td>
@@ -111,22 +110,22 @@ table, .table-in {
             <tr>
               <td><b>Nama</b></td>
               <td><b>:</b></td>
-              <td><b></b></td>
+              <td><b>{{$item->firstname}} {{$item->lastname}}</b></td>
             </tr>
             <tr>
               <td>NPM</td>
               <td>:</td>
-              <td></td>
+              <td>{{$item->username}}</td>
             </tr>
             <tr>
               <td>Program Studi</td>
               <td>:</td>
-              <td></td>
+              <td>{{$item->prodi}}</td>
             </tr>
             <tr>
               <td>Alasan</td>
               <td>:</td>
-              <td></td>
+              <td>{{$item->alasan}}</td>
             </tr>
           </table></b>
           <p>
@@ -144,8 +143,9 @@ table, .table-in {
     Wakil Rektor 1<br/><br/><br/>
       <img src="data:image/png;base64, {!! $image !!}">
     <br/>
-    <b><u></u></b><br/>
-    <b>NIK. </b>
+    <b><u><b>{{$item->nama}}</b></u></b><br/>
+    <b>NIK. {{$item->nik}}</b>
+    
 </div>
 <div class="kiri">
   <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
@@ -153,16 +153,20 @@ table, .table-in {
   <table>
     <tr>
       <td>1. </td>
-      <td>Administrasi Keuangan</td>
+      <td>Administrasi Akademik</td>
     </tr>
     <tr>
       <td>2. </td>
-      <td></td>
+      <td>Dosen PA : </td>
     </tr>
     <tr>
       <td>3. </td>
-      <td>Arsip</td>
+      <td>Program Studi : </td>
     </tr>
+    <tr>
+      <td>3. </td>
+      <td>Dekan Fakultas : </td>
+    </tr>    
   </table>
 </div>
           
@@ -233,5 +237,6 @@ Wassalamu’alaikum Warahmatullahi Wabarakaatuh<br/>
     ()<br/>
 </div><br/><br/> -->
 </p>
+@endforeach
 </body>
 </html>

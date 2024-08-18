@@ -17,12 +17,17 @@ class Mahasiswa extends Model
         'nik', 
         'pddikti',
         'dosen_id', 
-        'prodi_id',        
+        'prodi_id',   
+        'isComplete'     
+    ];
+
+    protected $casts = [        
+        'isComplete' => 'boolean'
     ];
 
     public function user(): BelongsTo 
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
     
     public function prodi(): BelongsTo

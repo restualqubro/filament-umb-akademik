@@ -18,6 +18,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable implements FilamentUser, MustVerifyEmail, HasAvatar, HasName, HasMedia
 {
@@ -41,7 +42,8 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
         'birth_place',
         'address',
         'agama',
-        'telp'
+        'telp',
+        'isComplete'
     ];
 
     /**
@@ -62,13 +64,14 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'isComplete' => 'boolean'
     ];
 
     protected $appends = ['name'];
 
     public function mahasiswa(): HasOne
     {
-        return $this->hasOne(Mahasiswa::class);
+        return $this->hasOne(Mahasiswa::class, 'user_id', 'id');
     }
 
     public function pegawai(): HasOne

@@ -64,7 +64,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                
                 // 'Report' => Cuti::route('/report'),
             ])
             ->routes(function () {
@@ -85,8 +84,7 @@ class AdminPanelProvider extends PanelProvider
                 Route::get('/validate/profesi/{id}', [Verified::class, 'profesi']);
             })
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
-            ->widgets([                
-                // Widgets\AccountWidget::class,
+            ->widgets([                                
                 // Widgets\FilamentInfoWidget::class,
             ])                      
             ->middleware([
