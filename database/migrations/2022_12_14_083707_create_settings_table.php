@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('settings', function (Blueprint $table): void {
             $table->id();
+
             $table->string('group');
             $table->string('name');
             $table->boolean('locked')->default(false);

@@ -13,7 +13,6 @@ use Filament\Support\Facades\FilamentView;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Storage;
 use Riodwanto\FilamentAceEditor\AceEditor;
-use App\Models\Data\TahunAkademik;
 
 use function Filament\Support\is_app_url;
 
@@ -78,44 +77,31 @@ class ManageGeneral extends SettingsPage
                                 ])
                                 ->native(false)
                                 ->required(),
-                            Forms\Components\Select::make('akademik_active')
-                                ->label('Status Akademik')
-                                ->options([
-                                    0 => "Not Active",
-                                    1 => "Active",
-                                ])
-                                ->native(false)
-                                ->required(),
-                            Forms\Components\Select::make('akademik_id')
-                                ->label('Kode Akademik')
-                                ->options(TahunAkademik::all()->pluck('code', 'id'))
-                                ->native(false)
-                                ->required(),
                         ]),
                         Forms\Components\Grid::make()->schema([
+                            Forms\Components\TextInput::make('brand_logoHeight')
+                                ->label(fn () => __('page.general_settings.fields.brand_logoHeight'))
+                                ->required()
+                                ->columnSpanFull()
+                                ->maxWidth('w-1/2'),
                             Forms\Components\Grid::make()->schema([
-                                Forms\Components\TextInput::make('brand_logoHeight')
-                                    ->label(fn () => __('page.general_settings.fields.brand_logoHeight'))
-                                    ->required()
-                                    ->columnSpan(2),
                                 Forms\Components\FileUpload::make('brand_logo')
                                     ->label(fn () => __('page.general_settings.fields.brand_logo'))
                                     ->image()
                                     ->directory('sites')
                                     ->visibility('public')
                                     ->moveFiles()
-                                    ->required()
-                                    ->columnSpan(2),
-                            ])
-                                ->columnSpan(2),
-                            Forms\Components\FileUpload::make('site_favicon')
-                                ->label(fn () => __('page.general_settings.fields.site_favicon'))
-                                ->image()
-                                ->directory('sites')
-                                ->visibility('public')
-                                ->moveFiles()
-                                ->acceptedFileTypes(['image/x-icon', 'image/vnd.microsoft.icon'])
-                                ->required(),
+                                    ->required(),
+
+                                Forms\Components\FileUpload::make('site_favicon')
+                                    ->label(fn () => __('page.general_settings.fields.site_favicon'))
+                                    ->image()
+                                    ->directory('sites')
+                                    ->visibility('public')
+                                    ->moveFiles()
+                                    ->acceptedFileTypes(['image/x-icon', 'image/vnd.microsoft.icon'])
+                                    ->required(),
+                            ]),
                         ])->columns(4),
                     ]),
                 Forms\Components\Tabs::make('Tabs')
@@ -123,19 +109,19 @@ class ManageGeneral extends SettingsPage
                         Forms\Components\Tabs\Tab::make('Color Palette')
                             ->schema([
                                 Forms\Components\ColorPicker::make('site_theme.primary')
-                                    ->label(fn () => __('page.general_settings.fields.primary'))->rgb(),
+                                    ->label(fn () => __('page.general_settings.fields.primary')),
                                 Forms\Components\ColorPicker::make('site_theme.secondary')
-                                    ->label(fn () => __('page.general_settings.fields.secondary'))->rgb(),
+                                    ->label(fn () => __('page.general_settings.fields.secondary')),
                                 Forms\Components\ColorPicker::make('site_theme.gray')
-                                    ->label(fn () => __('page.general_settings.fields.gray'))->rgb(),
+                                    ->label(fn () => __('page.general_settings.fields.gray')),
                                 Forms\Components\ColorPicker::make('site_theme.success')
-                                    ->label(fn () => __('page.general_settings.fields.success'))->rgb(),
+                                    ->label(fn () => __('page.general_settings.fields.success')),
                                 Forms\Components\ColorPicker::make('site_theme.danger')
-                                    ->label(fn () => __('page.general_settings.fields.danger'))->rgb(),
+                                    ->label(fn () => __('page.general_settings.fields.danger')),
                                 Forms\Components\ColorPicker::make('site_theme.info')
-                                    ->label(fn () => __('page.general_settings.fields.info'))->rgb(),
+                                    ->label(fn () => __('page.general_settings.fields.info')),
                                 Forms\Components\ColorPicker::make('site_theme.warning')
-                                    ->label(fn () => __('page.general_settings.fields.warning'))->rgb(),
+                                    ->label(fn () => __('page.general_settings.fields.warning')),
                             ])
                             ->columns(3),
                         Forms\Components\Tabs\Tab::make('Code Editor')

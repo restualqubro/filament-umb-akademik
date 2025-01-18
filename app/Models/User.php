@@ -7,7 +7,7 @@ use Filament\Models\Contracts\HasAvatar;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -17,12 +17,11 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class User extends Authenticatable implements FilamentUser, MustVerifyEmail, HasAvatar, HasName, HasMedia
 {
     use InteractsWithMedia;
-    use HasUlids, HasRoles;
+    use HasUuids, HasRoles;
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
@@ -34,14 +33,8 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
         'username',
         'email',
         'firstname',
-        'lastname',        
+        'lastname',
         'password',
-        'birth_date',
-        'gender', 
-        'birth_place',
-        'address',
-        'agama',
-        'telp'
     ];
 
     /**
@@ -63,18 +56,6 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-
-    protected $appends = ['name'];
-
-    public function mahasiswa(): HasOne
-    {
-        return $this->hasOne(Mahasiswa::class);
-    }
-
-    public function pegawai(): HasOne
-    {
-        return $this->hasOne(pegawai::class);
-    }
 
     public function getFilamentName(): string
     {
@@ -112,11 +93,4 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Has
             ->fit(Fit::Contain, 300, 300)
             ->nonQueued();
     }
-
-    // protected static function booted(): void
-    // {
-    //     static::creating(function (User $user) {
-    //         $user->role = 'user';
-    //     });
-    // }
 }
