@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('employee', function (Blueprint $table) {
             $table->id();
             $table->foreignUlid('user_id')->references('id')->on('users')->nullable();
-            $table->foreignUlid('program_data_id')->references('id')->on('program_data')->nullable();
+            $table->foreignId('program_data_id')->references('id')->on('program_data')->nullable();
             $table->timestamps();
         });
     }

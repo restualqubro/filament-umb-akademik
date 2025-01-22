@@ -16,7 +16,7 @@ class UsersTableSeeder extends Seeder
         $faker = Faker::create();
 
         // Superadmin user
-        $sid = Str::uuid();
+        $sid = Str::ulid();
         DB::table('users')->insert([
             'id' => $sid,
             'username' => 'superadmin',
@@ -35,7 +35,7 @@ class UsersTableSeeder extends Seeder
         $roles = DB::table('roles')->whereNot('name', 'super_admin')->get();
         foreach ($roles as $role) {
             for ($i = 0; $i < 10; $i++) {
-                $userId = Str::uuid();
+                $userId = Str::ulid();
                 DB::table('users')->insert([
                     'id' => $userId,
                     'username' => $faker->unique()->userName,

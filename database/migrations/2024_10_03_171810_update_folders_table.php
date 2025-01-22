@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::table('folders', function (Blueprint $table) {
             $table->boolean('is_public')->default(true)->nullable();
             $table->boolean('has_user_access')->default(false)->nullable();
-            $table->uuid('user_id')->nullable();
+            $table->ulid('user_id')->nullable();
             $table->string('user_type')->nullable();
         });
     }

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignUlid('user_id')->references('id')->on('users');                        
             $table->foreignUlid('lecture_id')->references('id')->on('users')->nullable();            
-            $table->foreignUlid('program_data_id')->references('id')->on('program_data')->nullable();
+            $table->foreignId('program_data_id')->references('id')->on('program_data')->nullable();
             $table->timestamps();
         });
     }

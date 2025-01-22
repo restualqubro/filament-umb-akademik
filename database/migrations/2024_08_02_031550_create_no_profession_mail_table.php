@@ -13,15 +13,15 @@ return new class extends Migration
     {
         Schema::create('no_profession_mail', function (Blueprint $table) {
             $table->id();
-            $table->foreignUlid('surat_id')->references('id')->on('surat');
-            $table->string('slip_beasspp');
-            $table->string('surat_pernyataan');
-            $table->string('memo_perpus');            
+            $table->foreignUlid('mail_id')->references('id')->on('mail');
+            $table->string('free_payment_bill');
+            $table->string('statement_letter');
+            $table->string('library_memo');            
             $table->foreignUlid('dosen_id')->references('id')->on('users')->nullable()->unsigned();
             $table->foreignUlid('kaprodi_id')->references('id')->on('users')->nullable()->unsigned();
             $table->foreignUlid('dekan_id')->references('id')->on('users')->nullable()->unsigned();
             $table->foreignUlid('wrektor_id')->references('id')->on('users')->nulalble()->unsigned();
-            $table->string('no_surat')->nullable();
+            $table->string('mail_number')->nullable();
             $table->timestamps();
         });
     }

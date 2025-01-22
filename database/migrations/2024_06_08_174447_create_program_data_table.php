@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('program_data', function (Blueprint $table) {
             $table->id();            
             $table->string('code', 7);
-            $table->foreignUuid('faculty_data_id')->references('id')->on('faculty_data_id');
+            $table->foreignId('faculty_data_id')->references('id')->on('faculty_data');
             $table->string('program_name');
             $table->timestamps();
         });
