@@ -46,11 +46,11 @@ class AdminPanelProvider extends PanelProvider
             ->sidebarCollapsibleOnDesktop()
             ->navigationGroups([
                 Navigation\NavigationGroup::make()
-                    ->label('Content') // !! To-Do: lang
-                    ->collapsible(false),
+                    ->label("Data")
+                    ->collapsed(),
                 Navigation\NavigationGroup::make()
                     ->label(__('menu.nav_group.access'))
-                    ->collapsible(false),
+                    ->collapsed(),
                 Navigation\NavigationGroup::make()
                     ->label(__('menu.nav_group.settings'))
                     ->collapsed(),
